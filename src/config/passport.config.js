@@ -39,7 +39,6 @@ const initializePassword = () => {
           }
         }))
 
-        n
         passport.serializeUser((user, done) => {
             done(null, user._id)
         })

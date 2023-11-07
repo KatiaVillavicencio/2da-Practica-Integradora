@@ -102,13 +102,41 @@ app.get("/carts/:cid", async (req, res) => {
         carts : allCarts
     });
 })
+
+//POST//
+
 //Ingreso Login http://localhost:8080/login
-app.get("/login", async (req, res) => {
-    res.render("login", {
-        title: "Vista Login",
-    });
-    
+app.post("/login", async (req, res) => {
+const {email, passport}= req.body;
+const emailTofind = email;
+const user = await usersModel.findEmail ({email: emailTofind});
+
+if (!user || user.password !== password){
+    return res.stattus(401).jason ({message: " error al autentificar"})
+}
+
+const token = generateAndSetToken (Res,email,password);
+res.json ({token,user:{email: user.email, rol: user.rol }});
+  
+});
+
+app.post("/api/register",async(req,res)=>{
+    const {first_name, last_name, email, age, password, rol}= req.body
+    const emailTofind = email;
+    const exists = await usersModel.findEmail ({email:emailTofind})
+    if (exists) return res.status(400).send ({stattus:"error", error: "usuario ya existe"})
+    const newUSer= {
+first_name,last_name,email,age, password, cart:cart.addCart(), rol};
+usersModel.addUser (newUser)
+const token = generateAndSetToken (res,email,password)
+res.send ({token})
+
 })
+
+
+
+//GET//
+
 //Ingreso Register http://localhost:8080/register
 app.get("/register", async (req, res) => { 
     res.render("register", {
