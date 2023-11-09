@@ -19,6 +19,8 @@ import userRouter from './routers/user.router.js';
 //socket.io
 import socketProducts from "./listeners/socketProducts.js"
 import socketChat from './listeners/socketChat.js';
+import { ExtractJwt } from 'passport-jwt';
+import JwtStrategy from 'passport-jwt/lib/strategy.js';
 
 
 const app = express();
@@ -57,6 +59,29 @@ app.use(
         saveUninitialized: false,
     })
 );
+
+//JWT//
+
+const jwtOptions= {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrkey: "Secret-key"
+}
+
+passport.use (
+    new JwtStrategy
+
+(jwtOptions, (jwt_payload, done)=>{
+    const user= user.findJWT((user) => user.email===jwt_payload.email)
+    if (!user)
+    {
+        return done (null,false, {message: "Usuario no encontrado"})
+}
+return done(null,user)
+})
+)
+
+
+
 
 //Middleware passport
 initializePassword();
@@ -115,7 +140,7 @@ if (!user || user.password !== password){
     return res.stattus(401).jason ({message: " error al autentificar"})
 }
 
-const token = generateAndSetToken (Res,email,password);
+const token = generateAndSetToken (res,email,password);
 res.json ({token,user:{email: user.email, rol: user.rol }});
   
 });
