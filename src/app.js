@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 import passport from 'passport';
 
 import connectToDB from "./config/configServer.js"
-import {__dirname} from "./utils.js"
+import {__dirname, authorization, passportCall} from "./utils.js"
 import initializePassword from './config/passport.config.js';
 
 //routes
@@ -19,8 +19,13 @@ import userRouter from './routers/user.router.js';
 //socket.io
 import socketProducts from "./listeners/socketProducts.js"
 import socketChat from './listeners/socketChat.js';
-import { ExtractJwt } from 'passport-jwt';
-import JwtStrategy from 'passport-jwt/lib/strategy.js';
+
+//Jwt/
+ 
+import {generateAndSetToken} from "./config/token.config.js"
+import { Strategy as JwtStrategy } from 'passport-jwt';
+import { ExtractJwt as ExtractJwt } from 'passport-jwt';
+
 
 
 const app = express();
@@ -62,13 +67,13 @@ app.use(
 
 //JWT//
 
-const jwtOptions= {
+const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrkey: "Secret-key"
+    secretOrKey: "Secret-key"
 }
 
 passport.use (
-    new JwtStrategy
+    new JwtStrategy 
 
 (jwtOptions, (jwt_payload, done)=>{
     const user= user.findJWT((user) => user.email===jwt_payload.email)
@@ -137,7 +142,7 @@ const emailTofind = email;
 const user = await usersModel.findEmail ({email: emailTofind});
 
 if (!user || user.password !== password){
-    return res.stattus(401).jason ({message: " error al autentificar"})
+    return res.status(401).json ({message: " error al autentificar"})
 }
 
 const token = generateAndSetToken (res,email,password);
@@ -156,14 +161,14 @@ usersModel.addUser (newUser)
 const token = generateAndSetToken (res,email,password)
 res.send ({token})
 
-})
+});
 
 
 
 //GET//
 
 //Ingreso Register http://localhost:8080/register
-app.get("/register", async (req, res) => { 
+/*app.get("/register", async (req, res) => { 
     res.render("register", {
         title: "Vista Register",
     });
@@ -182,5 +187,14 @@ app.get("/profile", async (req, res) => {
         rol: req.session.rolUsuario,
 
     });
-})
+})*/
 
+app.get ('/', (req, res) => {
+    res.sendFile ('home.handlebars',{root: app.get ("views") });
+});
+app.get('/register', (req, res) => {
+    res.sendFile ('register.handlebars',{root: app.get ("views") });
+});
+app.get('/current', passportCall ('jwt'), authorization ('user'), (req, res) => {
+    res.sendFile ('home.handlebars',{root: app.get ("views") });
+});

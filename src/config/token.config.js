@@ -5,3 +5,4 @@ import jwt from 'jsonwebtoken'
     res.cookie("token",token, { httpOnly: true, maxAge: 60 * 60 * 1000 });
     return token
  }
+
