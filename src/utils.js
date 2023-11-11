@@ -18,7 +18,7 @@ export const isValidPassword = (user,password) => bcrypt.compareSync (password, 
 
 
 export const createHash =async password => {
-    const saltRounds =10
+    const saltRounds = 10
     return await bcrypt.hash (password,saltRounds)
 }
 

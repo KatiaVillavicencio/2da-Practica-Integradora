@@ -5,6 +5,7 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
+import { createHash } from './utils.js';
 
 import connectToDB from "./config/server.config.js"
 import {__dirname, authorization, passportCall} from "./utils.js"
