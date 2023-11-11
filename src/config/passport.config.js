@@ -1,10 +1,14 @@
 import passport from "passport"
 import jwt from "passport-jwt"
 import local from 'passport-local'
+import { createHash, isValidPassword } from '../utils.js'
+import UserManager from "../dao/managers/UserManagerMongo.js"
+import GitHubStrategy from "passport-github2"
 
 
 const JwtStrategy = jwt.Strategy
 const ExtractJwt = jwt.ExtractJwt
+
 const cookieExtractor = req =>{
     let token = null
     if(req && req.cookies){
@@ -26,4 +30,9 @@ const initializePassport = () => {
     }
     ))
 }
+
+
+
+
+
 export default initializePassport

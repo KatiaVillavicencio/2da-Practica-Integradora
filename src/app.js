@@ -6,7 +6,7 @@ import MongoStore from "connect-mongo";
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 
-import connectToDB from "./config/configServer.js"
+import connectToDB from "./config/server.config.js"
 import {__dirname, authorization, passportCall} from "./utils.js"
 import initializePassword from './config/passport.config.js';
 
@@ -26,6 +26,8 @@ import {generateAndSetToken} from "./config/token.config.js"
 import { Strategy as JwtStrategy } from 'passport-jwt';
 import { ExtractJwt as ExtractJwt } from 'passport-jwt';
 
+import UserManager from './dao/managers/UserManagerMongo.js';
+import CartManager from './dao/managers/cartManagerMongo.js';
 
 
 const app = express();
@@ -47,10 +49,11 @@ connectToDB()
 const httpServer=app.listen(PORT,()=>{
     console.log(`server escuchandoooo en ${PORT}`)
 })
-
+ const users = new UserManager
+ const carts = new CartManager
 
 //session login//
-app.use(
+/*app.use(
     session({
         store: MongoStore.create({
             mongoUrl: "mongodb+srv://KatiaV:123@cluster0.y9v3q8o.mongodb.net/Ecommerce",
@@ -63,7 +66,7 @@ app.use(
         resave: false,
         saveUninitialized: false,
     })
-);
+);*/
 
 //JWT//
 
@@ -84,8 +87,6 @@ passport.use (
 return done(null,user)
 })
 )
-
-
 
 
 //Middleware passport
@@ -155,8 +156,8 @@ app.post("/api/register",async(req,res)=>{
     const emailTofind = email;
     const exists = await usersModel.findEmail ({email:emailTofind})
     if (exists) return res.status(400).send ({stattus:"error", error: "usuario ya existe"})
-    const newUSer= {
-first_name,last_name,email,age, password, cart:cart.addCart(), rol};
+    const newUser= {
+first_name,last_name, email, age, password, cart: carts.addCart(), rol};
 usersModel.addUser (newUser)
 const token = generateAndSetToken (res,email,password)
 res.send ({token})
@@ -164,11 +165,10 @@ res.send ({token})
 });
 
 
-
 //GET//
 
 //Ingreso Register http://localhost:8080/register
-/*app.get("/register", async (req, res) => { 
+app.get("/register", async (req, res) => { 
     res.render("register", {
         title: "Vista Register",
     });
@@ -187,7 +187,7 @@ app.get("/profile", async (req, res) => {
         rol: req.session.rolUsuario,
 
     });
-})*/
+})
 
 app.get ('/', (req, res) => {
     res.sendFile ('home.handlebars',{root: app.get ("views") });
