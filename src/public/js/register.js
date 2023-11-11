@@ -11,11 +11,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const first_name = first_nameInput.value;
     const last_name = last_nameInput.value;
     const email = emailInput.value;
-    const ag= ageInput.value;
+    const age= ageInput.value;
     const password = passwordInput.value;
     const rol = rolInput.value;
     try{
-        const rsponde = await fetch ("/api/register",{
+        const response = await fetch ("/api/register",{
             method:"POST",
             body: JSON.stringify({first_name, last_name, email, age, password, rol}),
             headers: {
@@ -32,12 +32,12 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 window.location.hreft= '/';
             }
         } else{
-            console.error ('Error al enviar mensaje. Estado:', response.status, 'texto', responde.statusText);
+            console.error ('Error al enviar mensaje. Estado:', response.status, 'texto', response.statusText);
 
         }
 
 
     } catch (error){
-        console.error ('eroor de red:', error):
+        console.error ('error de red:', error);
     }
     });

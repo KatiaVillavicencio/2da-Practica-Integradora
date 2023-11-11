@@ -167,7 +167,7 @@ res.send ({token})
 
 //GET//
 
-//Ingreso Register http://localhost:8080/register
+/*//Ingreso Register http://localhost:8080/register
 app.get("/register", async (req, res) => { 
     res.render("register", {
         title: "Vista Register",
@@ -187,7 +187,7 @@ app.get("/profile", async (req, res) => {
         rol: req.session.rolUsuario,
 
     });
-})
+})*/
 
 app.get ('/', (req, res) => {
     res.sendFile ('home.handlebars',{root: app.get ("views") });
