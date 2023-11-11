@@ -36,6 +36,8 @@ const PORT = process.env.PORT || 8080
 app.use(express.static(__dirname+"/public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use (cookieParser())
+
 
 
 //estructura de handlebars
@@ -53,7 +55,7 @@ const httpServer=app.listen(PORT,()=>{
  const carts = new CartManager
 
 //session login//
-/*app.use(
+app.use(
     session({
         store: MongoStore.create({
             mongoUrl: "mongodb+srv://KatiaV:123@cluster0.y9v3q8o.mongodb.net/Ecommerce",
@@ -66,7 +68,7 @@ const httpServer=app.listen(PORT,()=>{
         resave: false,
         saveUninitialized: false,
     })
-);*/
+)
 
 //JWT//
 
@@ -136,15 +138,16 @@ app.get("/carts/:cid", async (req, res) => {
 
 //POST//
 
-//Ingreso Login http://localhost:8080/login
+//autenticacion
 app.post("/login", async (req, res) => {
-const {email, passport}= req.body;
+const {email, password}= req.body;
 const emailTofind = email;
-const user = await usersModel.findEmail ({email: emailTofind});
+const user = await users.findEmail ({email: emailTofind});
 
 if (!user || user.password !== password){
     return res.status(401).json ({message: " error al autentificar"})
 }
+//// import token from ./config/token.config.js
 
 const token = generateAndSetToken (res,email,password);
 res.json ({token,user:{email: user.email, rol: user.rol }});
@@ -190,11 +193,11 @@ app.get("/profile", async (req, res) => {
 })*/
 
 app.get ('/', (req, res) => {
-    res.sendFile ('home.handlebars',{root: app.get ("views") });
+    res.sendFile ('html/index.html',{root: app.get ("views") });
 });
 app.get('/register', (req, res) => {
-    res.sendFile ('register.handlebars',{root: app.get ("views") });
+    res.sendFile ('html/register.html',{root: app.get ("views") });
 });
 app.get('/current', passportCall ('jwt'), authorization ('user'), (req, res) => {
-    res.sendFile ('home.handlebars',{root: app.get ("views") });
+    res.sendFile ('html/home.html',{root: app.get ("views") });
 });
